@@ -2,7 +2,7 @@
 
 > Automated Movie Review Classification System using Logistic Regression and Gradient Descent
 
-## 📋 Overview
+## Overview
 
 In the digital media landscape, platforms like **Rotten Tomatoes** receive 100+ movie reviews daily that must be manually classified as positive (Fresh 🍅) or negative (Rotten 🤢). This project develops an **AI-powered sentiment classifier** that achieves **70% validation accuracy** while reducing manual workload by **80%** (from 5 minutes to 1 minute per review).
 
@@ -18,7 +18,7 @@ Unlike black-box neural networks, this implementation provides **full transparen
 
 ---
 
-## 📊 Results
+## Results
 
 ### Performance Metrics
 
