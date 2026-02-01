@@ -2,7 +2,7 @@
 
 > Automated Movie Review Classification System using Logistic Regression and Gradient Descent
 
-## Project Resources
+## Quick Intro
 
 - [📝 Project Brief](./Project_Brief.pdf)
 
