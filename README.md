@@ -8,15 +8,15 @@
 
 ## Overview
 
-In the digital media landscape, platforms like **Rotten Tomatoes** receive 100+ movie reviews daily that must be manually classified as positive (Fresh 🍅) or negative (Rotten 🤢). This project develops an **AI-powered sentiment classifier** that achieves **70% validation accuracy** while reducing manual workload by **80%** (from 5 minutes to 1 minute per review).
+Review platforms like **Rotten Tomatoes** need every review labeled positive (Fresh 🍅) or negative (Rotten 🤢). This project builds a **sentiment classifier from scratch** that reaches **73.3% validation accuracy** on 3,554 held-out reviews (F1 0.730).
 
-Unlike black-box neural networks, this implementation provides **full transparency**—every word's weight is visible (e.g., "masterpiece" → +2.71, "boring" → -1.89), enabling editorial teams to audit decisions and maintain stakeholder trust.
+Unlike black-box neural networks, this implementation provides **full transparency**—every word's weight is visible (e.g., "performances" → +1.47, "boring" → -1.62), enabling editorial teams to audit decisions and maintain stakeholder trust.
 
 ### Key Features
 
-- **High Accuracy**: 96.2% training accuracy, 70.2% validation accuracy
+- **Accuracy**: 96.4% training accuracy, 73.3% validation accuracy
 - **Interpretable**: Transparent word weights for audit trails
-- **Scalable**: Processes 100+ reviews in <10 seconds
+- **Fast**: Scores all 3,554 validation reviews in well under a second, in pure Python
 - **Production-Ready**: Interactive CLI for real-time predictions
 - **From-Scratch Implementation**: No ML frameworks—proves deep mathematical understanding
 
@@ -26,43 +26,44 @@ Unlike black-box neural networks, this implementation provides **full transparen
 
 ### Performance Metrics
 
-| Metric | Target | Achieved | Status |
-|--------|--------|----------|--------|
-| **Training Accuracy** | >96% | **96.2%** |
-| **Validation Accuracy** | >70% | **70.2%** | 
-| **Time per Review** | <1 min | **<10 sec** |
-| **Workload Reduction** | 80% | **80%** |
+| Metric | Value |
+|--------|-------|
+| **Training Accuracy** | **96.4%** |
+| **Validation Accuracy** | **73.3%** |
+| **Validation F1** | **0.730** |
+| **False positives vs. false negatives** | 481 vs. 469 |
+
+These numbers come from `_eval/results.md`, which `python3 _eval/eval_metrics.py` regenerates (deterministic, about 40 seconds). `_eval/CLAIMS.md` maps every number in this README to its source.
 
 ### Model Insights
 
 **Top Positive Words** (from `weights` file):
 ```
-masterpiece    +2.71
-outstanding    +2.45
-brilliant      +2.31
-best           +2.18
-excellent      +2.04
+performances   +1.47
+world          +1.36
+moving         +1.34
+heart          +1.29
+works          +1.29
 ```
 
 **Top Negative Words**:
 ```
-waste          -2.34
-boring         -2.12
-awful          -1.98
-terrible       -1.87
-worst          -1.76
+bad            -1.75
+boring         -1.62
+dull           -1.61
+feels          -1.50
+silly          -1.30
 ```
 
 ### Example Prediction
 
-**Input Review**:
+**Input Review** (written for this demo, not from the dataset):
 > "Submerge by Movements is a competent but uninspired film"
 
-**Model Output**:
+**Model Output** (`python3 interactive.py`):
+- **Score** w·Φ(x): -0.26
 - **Predicted**: Negative (-1)
-- **Actual**: Negative (-1)
-- **Confidence**: 73.4%
-- **95% Prediction Interval**: [18.62, 81.86]
+- **Probability of positive** (sigmoid of the score): 43.5%
 
 ---
 
@@ -133,13 +134,13 @@ This project **deliberately avoids** scikit-learn, TensorFlow, and PyTorch to de
 
 **Objective**: Understand optimization through hand calculation
 
-Manually computed gradient descent for 4 mini-reviews:
+Manually computed one pass of gradient descent (α = 0.5) over 4 mini-reviews:
 1. "(0) pretty bad"
 2. "(1) good plot"
 3. "(0) not good"
 4. "(1) pretty scenery"
 
-Starting weights: `[0, 0, 0, 0, 0, 0]`  
+Starting weights (pretty, good, bad, plot, not, scenery): `[0, 0, 0, 0, 0, 0]`  
 Final weights: `[0.031088, -0.031088, -0.25, 0.25, -0.281088, 0.281088]`
 
 **Key Learning**: Understanding why `w = w - α·(h-y)·Φ(x)` works intuitively
@@ -163,19 +164,19 @@ Where:
 
 ### Milestone 3: Sparse Vector Operations
 
-**Challenge**: 470K vocabulary × 7K reviews = 3.3 billion potential entries
+**Challenge**: 11,622 training-set words × 3,554 training reviews = 41.3 million potential entries
 
 **Solution**: Store only non-zero features using Python dictionaries
 
 ```python
 # Dense representation (wasteful)
-dense_vector = [0, 0, 0, ..., 1, 0, 0, 1, ...]  # 470,000 elements
+dense_vector = [0, 0, 0, ..., 1, 0, 0, 1, ...]  # 11,622 elements
 
 # Sparse representation (efficient)
-sparse_vector = {'good': 1, 'movie': 1, 'best': 1}  # ~50 elements
+sparse_vector = {'good': 1, 'movie': 1, 'best': 1}  # ~19 elements on average
 ```
 
-**Memory Reduction**: 99.99% (from ~3.3B to ~350K entries)
+**Memory Reduction**: 99.84% (from ~41.3M to ~67K stored entries)
 
 **Implemented Operations**:
 - `extractWordFeatures(x)`: Text → Dict[str, int]
@@ -207,7 +208,7 @@ for epoch in range(40):
     val_error = evaluate(validation_data)
 ```
 
-**Key Observation**: At epoch 70, training error drops to 1.2% but validation error rises to 33.1% → **overfitting detected**
+**Key Observation**: Training error keeps falling with more epochs (7.4% at 20, 3.6% at 40, 1.5% at 70), but validation error stays around 26–28%. Extra epochs mostly memorize the training set.
 
 ### Milestone 5: Advanced Features
 
@@ -226,7 +227,7 @@ Why character-level features matter for film criticism:
 
 **Comparison**:
 - `extractWordFeatures()`: Better for common words, interpretable weights
-- `extractCharacterFeatures(4)`: Better for jargon, captures morphology
+- `extractCharacterFeatures(4)`: Can pick up word parts like "-esque" across unseen words; on this dataset it did not beat word features (27.5% vs. 26.7% validation error, see `_eval/results.md`)
 
 ---
 
@@ -234,20 +235,20 @@ Why character-level features matter for film criticism:
 
 ### 1. Overfitting is Insidious
 
-**Observation**: At epoch 40, validation error plateaus at 29.8%, but training error continues decreasing.
+**Observation**: Validation error levels off around 26–27% after 40 epochs, while training error keeps decreasing. Character 5-grams go further: 0% training error, yet their validation F1 (0.733) is no better than word features (0.730).
 
 **Lesson**: Always monitor validation curves—improving training accuracy ≠ better model.
 
 **Solution**: Early stopping + regularization in future iterations.
 
-### 2. Character N-Grams > Words for Domain Jargon
+### 2. Character N-Grams for Domain Jargon
 
 **Why**: Film critics use specialized morphology:
 - Suffixes: "-esque" (Kafkaesque, Chaplinesque)
 - Prefixes: "pseudo-", "quasi-" (pseudo-intellectual, quasi-documentary)
 - Word roots: "auteur", "noir", "mise-en-scène"
 
-**Result**: `extractCharacterFeatures(4)` captures these patterns across unseen words.
+**Result**: On this dataset, character n-grams didn't beat word features overall (best validation F1: 0.733 for 5-grams vs. 0.730 for words), so the morphology benefit is still a hypothesis to test on jargon-heavy reviews.
 
 ### 3. Interpretability > Accuracy for Trust
 
@@ -314,10 +315,12 @@ weights = submission.learnPredictor(
 )
 ```
 
-**Observation**: 
-- **epochs = 20**: Underfitting (train: 5.2%, val: 31.1%)
-- **epochs = 40**: Optimal (train: 3.8%, val: 29.8%)
-- **epochs = 80**: Overfitting (train: 1.1%, val: 32.3%)
+**Observation** (error rates, alpha = 0.01):
+- **epochs = 20**: train 7.4%, val 27.7%
+- **epochs = 40** (default): train 3.6%, val 26.7%
+- **epochs = 80**: train 1.2%, val 26.3%
+
+Validation error barely moves after 40 epochs, while the gap to training error keeps widening.
 
 ### Debugging Misclassifications
 
@@ -325,12 +328,15 @@ weights = submission.learnPredictor(
 # Generate detailed error analysis
 python grader.py  # Outputs to error-analysis file
 
-# Sample from error-analysis:
-# === The film is a masterpiece of modern cinema
-# Truth: 1, Prediction: 1 [CORRECT]
-# masterpiece    2 * 2.71 = 5.42
-# modern         1 * 1.34 = 1.34
-# cinema         1 * 0.87 = 0.87
+# Sample from error-analysis (a real miss):
+# === nothing short of a masterpiece -- and a challenging one .
+# Truth: 1, Prediction: -1 [WRONG]
+# masterpiece    1 * 0.48 = 0.48
+# challenging    1 * 0.28 = 0.28
+# ...
+# nothing        1 * -0.60 = -0.60
+# short          1 * -0.83 = -0.83
+# "nothing short of" is praise, but a bag-of-words model scores "nothing" and "short" as negative.
 ```
 
 ---
