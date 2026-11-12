@@ -349,8 +349,7 @@ python grader.py  # Outputs to error-analysis file
 - **Labels**: Binary (+1 positive, -1 negative)
 
 ### Academic Background
-- **Course**: Stanford CS221 - Artificial Intelligence
-- **Difficulty**: Graduate-level machine learning
+- **Course**: [stanCode](https://stancode.tw/) SC201
 - **Topics**: Supervised learning, optimization, NLP
 
 ### Key Papers
@@ -387,7 +386,7 @@ This is an educational project demonstrating ML fundamentals. While pull request
 
 ## 🙏 Acknowledgments
 
-- **Stanford CS221** for the original assignment inspiration
+- **stanCode SC201** for the original assignment
 - **Rotten Tomatoes** for the real-world use case
 - **Film critics** whose reviews trained this model
 - **Open-source community** for Python and educational resources
@@ -395,7 +394,6 @@ This is an educational project demonstrating ML fundamentals. While pull request
 ---
 
 **Tech Stack**: Python • Machine Learning • NLP • Logistic Regression • Gradient Descent  
-**Complexity**: Stanford CS221-Level Graduate Coursework  
 **Time Investment**: 15 hours  
 
 ---

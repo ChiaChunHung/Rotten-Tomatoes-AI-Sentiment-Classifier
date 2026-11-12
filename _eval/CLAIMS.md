@@ -37,4 +37,4 @@ Rewritten on 2026-11-12 so every number matches the current code. Where each num
 
 Removed because nothing in this folder reproduced them: 96.2% / 70.2% accuracy, masterpiece +2.71 and the old top-word lists, "overfitting at epoch 70 (33.1%)", the old epoch table, 80% workload reduction, 5 min → 1 min per review, the 73.4% confidence and prediction interval.
 
-**Note:** the `weights` and `error-analysis` files currently in this folder are still the old ones, from an older version of `submission.py` (similar word ranking, larger weights). Run `python3 grader.py` to regenerate them so they match the README.
+**Note:** `weights` and `error-analysis` are written by `python3 grader.py`. The copies on GitHub were regenerated with the current code on 2026-11-12. Older local copies came from an earlier version of `submission.py` (similar word ranking, larger weights); if `weights` has masterpiece at about 0.82 instead of 0.48, it is an old copy, so run `python3 grader.py` to regenerate it.

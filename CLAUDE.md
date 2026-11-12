@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Rotten Tomatoes sentiment classifier: logistic regression written from scratch (`submission.py`), trained on `polarity.train`, evaluated on `polarity.dev`. Originally a course assignment (`grader.py`, `graderUtil.py`).
+Rotten Tomatoes sentiment classifier: logistic regression written from scratch (`submission.py`), trained on `polarity.train`, evaluated on `polarity.dev`. Originally a stanCode SC201 assignment (`grader.py`, `graderUtil.py`).
 
 ## Where the numbers come from
 
